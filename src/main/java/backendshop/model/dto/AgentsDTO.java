@@ -12,8 +12,8 @@ public class AgentsDTO {
     private Long id;
     private String agentCode;
     private String agentName;
+    private String chargeName;
     private String email;
-    public String passWord;
     private String bankCode;
     private String bankName;
     private Long accountNumber;

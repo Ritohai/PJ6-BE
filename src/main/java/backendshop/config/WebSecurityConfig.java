@@ -57,8 +57,7 @@ public class WebSecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests((auth) -> auth.requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/agent/**").hasAnyAuthority("ADMIN")
-//
-//                        .requestMatchers("/api/v1/owner/**").hasAnyAuthority("USER")
+                        .requestMatchers("/api/v1/owners/**").hasAnyAuthority("ADMIN")
                         .anyRequest().authenticated())
                 .exceptionHandling((auth) -> auth.authenticationEntryPoint(entryPoint))
                 .sessionManagement((auth) -> auth.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

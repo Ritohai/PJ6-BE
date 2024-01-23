@@ -2,8 +2,6 @@ package backendshop.controller;
 
 import backendshop.exception.customer.CustomersException;
 import backendshop.model.dto.AgentsDTO;
-import backendshop.model.dto.request.AgentRequest;
-import backendshop.model.dto.response.AgentResponse;
 import backendshop.model.entity.Agents;
 import backendshop.service.impl.agent.AgentService;
 import jakarta.validation.Valid;
@@ -19,7 +17,7 @@ import java.util.List;
 public class AgentController {
     @Autowired
     private AgentService agentService;
-    @PostMapping("/register")
+    @PostMapping
     public ResponseEntity<String> create(@Valid @RequestBody AgentsDTO agentsDTO) throws CustomersException {
         return new ResponseEntity<>(agentService.create(agentsDTO), HttpStatus.CREATED);
     }

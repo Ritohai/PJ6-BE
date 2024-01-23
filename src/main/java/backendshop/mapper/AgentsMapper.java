@@ -15,11 +15,5 @@ public interface AgentsMapper {
     AgentsDTO AgentsToAgentDTO(Agents agents);
     Agents AgentsDTOToAgents(AgentsDTO agentsDTO);
 
-//    @AfterMapping
-//    default void customizeDTO(Agents agents, @MappingTarget AgentsDTO agentsDTO) {
-//        // Các xử lý tùy chỉnh sau khi ánh xạ
-//        agents.setRoleUser(RoleUser.AGENT);
-//        agentsDTO.setRoleUser(RoleUser.AGENT.name());
-//    }
 
 }

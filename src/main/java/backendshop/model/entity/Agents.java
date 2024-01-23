@@ -13,16 +13,14 @@ public class Agents extends GeneralClass {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    //    @Column(name = "parent_agent_id")
-//    private Long parentId;
     @Column(name = "agent_code")
     private String agentCode;
     @Column(name = "agent_name")
     private String agentName;
+    @Column(name = "charge_name")
+    private String chargeName;
     @Column(name = "email")
     private String email;
-    @Column(name = "password")
-    private String passWord;
     @Column(name = "bank_code")
     private String bankCode;
     @Column(name = "bank_name")

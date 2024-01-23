@@ -26,13 +26,8 @@ public class Owners extends GeneralClass {
     private String phone ;
     @Column(name = "company")
     private String company;
-    @Column(name = "city")
-    private String city;
-    @Column(name = "zip_code1")
-    private int zipCode1;
-    @Column(name = "zip_code2")
-    private int zipCode2;
     @Column(name = "address")
     private String address;
-
+    @Column(name = "role_user")
+    private RoleUser roleUser;
 }

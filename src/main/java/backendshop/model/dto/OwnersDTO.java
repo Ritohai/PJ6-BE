@@ -1,7 +1,7 @@
 package backendshop.model.dto;
 
-import backendshop.model.entity.Agents;
-import jakarta.persistence.Column;
+
+import backendshop.model.entity.RoleUser;
 import lombok.*;
 
 @NoArgsConstructor
@@ -14,11 +14,8 @@ public class OwnersDTO {
     private String firstName;
     private String lastName;
     private String email;
-    private String phone ;
+    private String phone;
     private String company;
-    private String city;
-    private int zipCode1;
-    private int zipCode2;
     private String address;
-
+    private String roleUser = RoleUser.OWNER.toString();
 }
