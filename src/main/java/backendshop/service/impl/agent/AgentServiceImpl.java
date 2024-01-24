@@ -4,11 +4,25 @@ import backendshop.exception.customer.CustomersException;
 import backendshop.mapper.AgentsMapper;
 import backendshop.model.dto.AgentsDTO;
 import backendshop.model.entity.Agents;
+import backendshop.model.entity.RoleUser;
 import backendshop.repository.AgentRepository;
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,6 +88,43 @@ public class AgentServiceImpl implements AgentService {
             return "Xóa thành công.";
         } else {
             throw new CustomersException("Không thấy id.");
+        }
+    }
+
+    @Override
+    public List<AgentsDTO> findAllBySearch(String search, Integer startId, Integer endId, String field, String sort, Integer page, Integer limit) {
+        Sort sort1 = Sort.by(field);
+        Page<Agents> agents = null;
+        Pageable pageable = PageRequest.of(1, 10);
+        if (startId != null && endId != null) {
+            agents = agentRepository.searchByAgentCodeOrAccountNameOrGroupOrId(search, startId, endId, pageable);
+        }else {
+            agents = agentRepository.searchByAgentCodeOrAccountNameOrGroupOrId(search,null, null, PageRequest.of(page, limit).withSort(sort1));
+        }
+
+        List<AgentsDTO> agentsDTOList = new ArrayList<>();
+        if (agents != null && agents.hasContent()) {
+            for (Agents agent : agents) {
+                AgentsDTO agentsDTO = AgentsMapper.INSTANCE.AgentsToAgentDTO(agent);
+                agentsDTOList.add(agentsDTO);
+            }
+        }
+
+        return agentsDTOList;
+    }
+
+//    File CSV
+    @Override
+    public void exportToCsv(HttpServletResponse response, List<Agents> data) throws IOException {
+        response.setContentType("text/csv");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=data.csv");
+
+        try (PrintWriter writer = response.getWriter();
+             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("id", "agent_code"))) {
+            for (Agents row : data) {
+                csvPrinter.printRecord(row.getId(), row.getAgentName());
+
+            }
         }
     }
 }
