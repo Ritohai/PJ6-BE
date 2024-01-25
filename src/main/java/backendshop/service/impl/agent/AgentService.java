@@ -21,7 +21,7 @@ public interface AgentService {
     List<Agents> findAll();
     String deleteFlag(Long id) throws CustomersException;
 
-    List<AgentsDTO> findAllBySearch(String search,Integer startId, Integer endId,String field, String sort, Integer page, Integer limit );
+    List<Agents> findAllBySearch(String search,Integer startId, Integer endId,String field, String sort, Integer page, Integer limit );
 
 //    File CSV
     void exportToCsv(HttpServletResponse response, List<Agents> data) throws IOException;

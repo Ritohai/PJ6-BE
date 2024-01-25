@@ -7,22 +7,35 @@ import backendshop.model.entity.Agents;
 import backendshop.model.entity.Owners;
 import backendshop.repository.AgentRepository;
 import backendshop.repository.OwnerRepository;
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.http.HttpResponse;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class OwnerServiceImpl implements OwnerService{
+public class OwnerServiceImpl implements OwnerService {
     @Autowired
     private OwnerRepository ownerRepository;
     @Autowired
     private AgentRepository agentRepository;
+
     @Override
     public String create(OwnersDTO ownersDTO) throws CustomersException {
         if (ownerRepository.existsByEmail(ownersDTO.getEmail())) {
-            throw  new CustomersException("Email đã tồn tại.");
+            throw new CustomersException("Email đã tồn tại.");
         }
         if (ownerRepository.existsByPhone(ownersDTO.getPhone())) {
             throw new CustomersException("Số điện thoại đã ồn tại.");
@@ -72,5 +85,40 @@ public class OwnerServiceImpl implements OwnerService{
         } else {
             throw new CustomersException("Không thấy id.");
         }
+    }
+
+    @Override
+    public List<Owners> findAllBySearch(String search, Integer startId, Integer endId, String field, String sort, Integer page, Integer limit) {
+        Sort sort1 = Sort.by(field);
+        Page<Owners> owners;
+        Pageable pageable = PageRequest.of(page, limit).withSort(sort1);
+        if (startId != null && endId != null) {
+            owners = ownerRepository.searchByFirstNameOrLastNameOrEmailOrPhoneOrId(null, startId, endId, pageable);
+        } else {
+            owners = ownerRepository.searchByFirstNameOrLastNameOrEmailOrPhoneOrId(search, null, null, pageable);
+        }
+
+        List<Owners> list = new ArrayList<>();
+        if (owners != null && owners.hasContent()) {
+            for (Owners o : owners) {
+                list.add(o);
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public void exportToCSVOwner(HttpServletResponse response, List<Owners> owners) throws IOException {
+        response.setContentType("text/csv");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=data_owner.csv");
+        try (
+                PrintWriter writer = response.getWriter();
+                CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("id", "agent_id", "first_name", "last_name", "email", "phone", "company", "address", "role_user", "created_date", "update_date", " status"))) {
+            for (Owners o: owners) {
+                csvPrinter.printRecord(o.getId(),o.getAgentId(),o.getFirstName(),o.getLastName(),o.getEmail(),o.getPhone(),o.getCompany(),o.getAddress(),o.getRoleUser(), o.getCreateDate(), o.getUpdateDate(), o.isDeleteFlag());
+            }
+        }
+
+
     }
 }

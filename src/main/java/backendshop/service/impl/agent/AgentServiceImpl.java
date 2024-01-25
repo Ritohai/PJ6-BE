@@ -92,38 +92,36 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
-    public List<AgentsDTO> findAllBySearch(String search, Integer startId, Integer endId, String field, String sort, Integer page, Integer limit) {
+    public List<Agents> findAllBySearch(String search, Integer startId, Integer endId, String field, String sort, Integer page, Integer limit) {
         Sort sort1 = Sort.by(field);
         Page<Agents> agents = null;
-        Pageable pageable = PageRequest.of(1, 10);
+        Pageable pageable = PageRequest.of(page, limit).withSort(sort1);
         if (startId != null && endId != null) {
-            agents = agentRepository.searchByAgentCodeOrAccountNameOrGroupOrId(search, startId, endId, pageable);
+            agents = agentRepository.searchByAgentCodeOrAccountNameOrChargeNameOrId(null, startId, endId, pageable);
         }else {
-            agents = agentRepository.searchByAgentCodeOrAccountNameOrGroupOrId(search,null, null, PageRequest.of(page, limit).withSort(sort1));
+            agents = agentRepository.searchByAgentCodeOrAccountNameOrChargeNameOrId(search,null, null, PageRequest.of(page, limit).withSort(sort1));
         }
 
-        List<AgentsDTO> agentsDTOList = new ArrayList<>();
+        List<Agents> agentsList = new ArrayList<>();
         if (agents != null && agents.hasContent()) {
             for (Agents agent : agents) {
-                AgentsDTO agentsDTO = AgentsMapper.INSTANCE.AgentsToAgentDTO(agent);
-                agentsDTOList.add(agentsDTO);
+                agentsList.add(agent);
             }
         }
-
-        return agentsDTOList;
+        return agentsList;
     }
 
-//    File CSV
+
+    //    File CSV
     @Override
     public void exportToCsv(HttpServletResponse response, List<Agents> data) throws IOException {
         response.setContentType("text/csv");
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=data.csv");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=data_agent.csv");
 
         try (PrintWriter writer = response.getWriter();
-             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("id", "agent_code"))) {
+             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("id","create_date", "update_date", "agent_code","agent_name", "charge_name", "email", "bank_code","back_name","account_number","account_name","group_agent","role_user", "status"))) {
             for (Agents row : data) {
-                csvPrinter.printRecord(row.getId(), row.getAgentName());
-
+                csvPrinter.printRecord(row.getId(),row.getCreateDate(), row.getUpdateDate(), row.getAgentCode(), row.getAgentName(),row.getChargeName(), row.getEmail(), row.getBankCode(), row.getBankName(), row.getAccountNumber(), row.getAccountName(),row.getGroup(), row.getRoleUser(), row.isDeleteFlag());
             }
         }
     }
